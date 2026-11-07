@@ -2445,7 +2445,12 @@ class StyleGuide:
         if not self.options.exclude:
             return False
         basename = os.path.basename(filename)
-        if filename_match(basename, self.options.exclude):
+        # Do not match '.' or '..' against the patterns: a pattern
+        # such as '.*' is meant to exclude hidden files and
+        # directories, not the current (or parent) directory itself.
+        # (Same fix as flake8's for PyCQA/flake8#360.)
+        if basename not in ('.', '..') and filename_match(
+                basename, self.options.exclude):
             return True
         if parent:
             filename = os.path.join(parent, filename)
